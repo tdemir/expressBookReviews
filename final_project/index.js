@@ -18,19 +18,22 @@ app.use(
 );
 
 app.use("/customer/auth/*", function auth(req, res, next) {
-  //Write the authenication mechanism here
-  if (req.session.authorization) {
-    let token = req.session.authorization["accessToken"];
-    jwt.verify(token, "access", (err, user) => {
-      if (!err) {
+  const authorizationText = req.header("authorization");
+  if (!authorizationText) {
+    return res.status(401).json({ error: "Access-denied" });
+  }
+  try {
+    console.log(authorizationText);
+    jwt.verify(authorizationText.slice(7), "access", (err, user) => {
+      if (err) {
+        return res.status(403).json({ message: "User not authenticated" });
+      } else {
         req.user = user;
         next(); // Proceed to the next middleware
-      } else {
-        return res.status(403).json({ message: "User not authenticated" });
       }
     });
-  } else {
-    return res.status(403).json({ message: "User not logged in" });
+  } catch (error) {
+    res.status(401).json({ error: "Invalid-token" });
   }
 });
 
