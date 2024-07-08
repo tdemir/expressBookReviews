@@ -55,7 +55,21 @@ public_users.get("/author/:author", function (req, res) {
 // Get all books based on title
 public_users.get("/title/:title", function (req, res) {
   //Write your code here
-  return res.status(300).json({ message: "Yet to be implemented" });
+  const title = req.params.title;
+
+  if (title) {
+    const isbns = Object.keys(books);
+    let titleBooks = [];
+    for (let i = 0; i < isbns.length; i++) {
+      const isbn = isbns[i];
+      if (books[isbn].title === title) {
+        titleBooks.push(books[isbn]);
+      }
+    }
+    return res.status(200).send(JSON.stringify(titleBooks));
+  }
+  return res.status(400).send("title parameter doesnot send");
+  //return res.status(300).json({ message: "Yet to be implemented" });
 });
 
 //  Get book review
