@@ -37,19 +37,6 @@ regd_users.post("/login", (req, res) => {
   //return res.status(300).json({ message: "Yet to be implemented" });
 });
 
-//*****
-function verifyToken(req, res, next) {
-  const token = req.header("Authorization");
-  if (!token) return res.status(401).json({ error: "Access denied" });
-  try {
-    const decoded = jwt.verify(token, "your-secret-key");
-    req.userId = decoded.userId;
-    next();
-  } catch (error) {
-    res.status(401).json({ error: "Invalid token" });
-  }
-}
-
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
   const isbn = req.params.isbn;
@@ -67,6 +54,21 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
       return res.status(200).send(JSON.stringify(bookItem.reviews));
     }
     return res.status(400).send("item doesnot exist");
+  }
+  return res.status(400).send("Please write valid isbn");
+  //return res.status(300).json({ message: "Yet to be implemented" });
+});
+
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+  const isbn = req.params.isbn;
+  const currentUserName = req.user.username;
+
+  if (isbn) {
+    let bookItem = books[isbn];
+    if (bookItem && bookItem.reviews[currentUserName]) {
+      delete bookItem.reviews[currentUserName];
+    }
+    return res.status(200).send(JSON.stringify(bookItem.reviews));
   }
   return res.status(400).send("Please write valid isbn");
   //return res.status(300).json({ message: "Yet to be implemented" });
