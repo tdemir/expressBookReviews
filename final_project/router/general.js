@@ -9,8 +9,11 @@ public_users.post("/register", (req, res) => {
   if (!password) {
     return res.status(400).send("Please write valid password");
   }
-  if (!isValid(username)) {
+  if (!username) {
     return res.status(400).send("Please write valid username");
+  }
+  if (users.filter((item) => item.username === username).length !== 0) {
+    return res.status(400).send("Please write different username");
   }
   users.push({ username, password });
   return res.status(200).send(JSON.stringify({ username, password }));
@@ -19,7 +22,6 @@ public_users.post("/register", (req, res) => {
 
 // Get the book list available in the shop
 public_users.get("/", function (req, res) {
-  //Write your code here
   return res.status(200).send(JSON.stringify(books));
   //return res.status(300).json({ message: "Yet to be implemented" });
 });

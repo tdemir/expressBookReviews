@@ -11,7 +11,7 @@ const isValid = (username) => {
   if (!username) {
     return false;
   }
-  return users.filter((item) => item.username === username).length === 0;
+  return users.filter((item) => item.username === username).length !== 0;
 };
 
 const authenticatedUser = (username, password) => {
@@ -26,8 +26,15 @@ const authenticatedUser = (username, password) => {
 
 //only registered users can login
 regd_users.post("/login", (req, res) => {
-  //Write your code here
-  return res.status(300).json({ message: "Yet to be implemented" });
+  const { username, password } = req.body;
+  if (!isValid(username) || !authenticatedUser(username, password)) {
+    return res.status(400).send("Please write valid username and password");
+  }
+  const token = jwt.sign({ username: username }, "access", {
+    expiresIn: "1h",
+  });
+  return res.status(200).send(token);
+  //return res.status(300).json({ message: "Yet to be implemented" });
 });
 
 // Add a book review
